@@ -40,51 +40,23 @@ impl<T> Display for MarkupDisplay<T> where T: Display {
     }
 }
 
-
-fn escapable(b: u8) -> bool {
-    match b {
-        b'<' | b'>' | b'&' | b'"' | b'\'' | b'/' => true,
-        _ => false,
+pub fn escape(input: String) -> String {
+    let mut output = String::with_capacity(input.len() * 2);
+    for c in input.chars() {
+        match c {
+            '&' => output.push_str("&amp;"),
+            '<' => output.push_str("&lt;"),
+            '>' => output.push_str("&gt;"),
+            '"' => output.push_str("&quot;"),
+            '\'' => output.push_str("&#x27;"),
+            '/' => output.push_str("&#x2F;"),
+            '`' => output.push_str("&#96;"),
+            _ => output.push(c)
+        }
     }
+
+    output
 }
-
-pub fn escape(s: String) -> String {
-    let mut found = Vec::new();
-    for (i, b) in s.as_bytes().iter().enumerate() {
-        if escapable(*b) {
-            found.push(i);
-        }
-    }
-    if found.is_empty() {
-        return s;
-    }
-
-    let bytes = s.as_bytes();
-    let max_len = bytes.len() + found.len() * 5;
-    let mut res = Vec::<u8>::with_capacity(max_len);
-    let mut start = 0;
-    for idx in &found {
-        if start < *idx {
-            res.extend(&bytes[start..*idx]);
-        }
-        start = *idx + 1;
-        match bytes[*idx] {
-            b'<' => { res.extend(b"&lt;"); },
-            b'>' => { res.extend(b"&gt;"); },
-            b'&' => { res.extend(b"&amp;"); },
-            b'"' => { res.extend(b"&quot;"); },
-            b'\'' => { res.extend(b"&#x27;"); },
-            b'/' => { res.extend(b"&#x2f;"); },
-            _ => panic!("incorrect indexing"),
-        }
-    }
-    if start < bytes.len() - 1 {
-        res.extend(&bytes[start..]);
-    }
-
-    String::from_utf8(res).unwrap()
-}
-
 
 #[cfg(test)]
 mod tests {
