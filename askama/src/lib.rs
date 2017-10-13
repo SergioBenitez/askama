@@ -307,7 +307,7 @@ pub mod rocket {
 
     pub use self::rocket::response::{Responder, Result};
 
-    pub fn respond(t: &super::Template, ext: &str) -> Result {
+    pub fn respond(t: &super::Template, ext: &str) -> Result<'static> {
         let rsp = t.render().map_err(|_| Status::InternalServerError)?;
         let ctype = ContentType::from_extension(ext).ok_or(Status::InternalServerError)?;
         Response::build()
