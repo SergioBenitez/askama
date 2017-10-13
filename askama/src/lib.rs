@@ -300,9 +300,9 @@ pub mod iron {
 pub mod rocket {
     extern crate rocket;
 
-    use self::rocket::http::{ContentType, Status};
-    use self::rocket::request::Request;
-    use self::rocket::response::Response;
+    pub use self::rocket::http::{ContentType, Status};
+    pub use self::rocket::request::Request;
+    pub use self::rocket::response::Response;
     use std::io::Cursor;
 
     pub use self::rocket::response::{Responder, Result};
