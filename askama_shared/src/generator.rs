@@ -739,13 +739,16 @@ impl<'a> Generator<'a> {
         if s.is_empty() {
             return;
         }
+
         if s == "}" {
             self.dedent();
         }
+
         self.write(s);
         if s.ends_with('{') {
             self.indent();
         }
+
         self.buf.push('\n');
         self.start = true;
     }
@@ -765,7 +768,10 @@ impl<'a> Generator<'a> {
     }
 
     fn dedent(&mut self) {
-        self.indent -= 1;
+        // FIXME: 'indent' should never go below 1. This shouldn't need to be
+        // patched on-the-fly like this; no one should call 'dedent' more times
+        // than 'indent'. But some code does. This is a "patch".
+        self.indent = if self.indent == 0 { 0 } else { self.indent - 1 }
     }
 }
 
